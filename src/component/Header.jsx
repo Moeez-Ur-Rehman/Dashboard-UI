@@ -6,8 +6,8 @@ const Header = () => {
         <h1 className="text-2xl font-bold">Landing Page</h1>
         <div className="space-x-4">
           <Link to="/" className="text-gray-700 hover:text-blue-500">Home</Link>
-          <Link to="/signup" className="text-gray-700 hover:text-blue-500">Sign Up</Link>
-          <Link to="/login" className="text-gray-700 hover:text-blue-500">Login</Link>
+          <Link to="/Signup" className="text-gray-700 hover:text-blue-500">Sign Up</Link>
+          <Link to="/Signin" className="text-gray-700 hover:text-blue-500">Login</Link>
         </div>
       </nav>
     </header>)
