@@ -1,18 +1,31 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase/config';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const [user] = useAuthState(auth);
 
   const toggleMenu = () => {
     setIsMenuOpen(prev => !prev);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/signin');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 shadow-md">
       <div className="max-w-screen-xl mx-auto p-4 flex flex-wrap items-center justify-between">
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
-          
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">MySite</span>
         </div>
 
@@ -32,18 +45,38 @@ const Header = () => {
 
         <div className={`w-full md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 md:justify-center md:items-center md:mt-0">
-          <li>
-            <Link to="/" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">   
+            {user ? (
+              <>
+                <li>
+                  <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">  
+                    Profile
+                  </Link>
+                </li>
+                <li>
+                  <button onClick={handleLogout} className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+                    Logout
+                  </button>
+                </li>
+                <li>
+            <Link to="/get-started" className="block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition mt-4 md:mt-0 md:ml-4">
+            Get Premium
+            </Link>
+          </li>
+              </>
+            ) : (
+              <>
+                <li>
+            <Link to="/" className="block py-2 px-3 pl-5 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 ">   
             Home
             </Link>
           </li>
-          <li className="px-4">  
-            <Link to="/signin" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">    
+          <li >  
+            <Link to="/signin" className="block py-2 px-3 pl-5 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">    
             Sign In
             </Link>
           </li>
           <li>
-            <Link to="/signup" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+            <Link to="/signup" className="block py-2 px-3 pl-7 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
             Sign Up
             </Link>
           </li>
@@ -52,6 +85,8 @@ const Header = () => {
             Get Started
             </Link>
           </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
