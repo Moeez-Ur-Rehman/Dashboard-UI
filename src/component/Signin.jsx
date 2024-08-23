@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { auth } from '../firebase/config';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { auth,googleProvider } from '../firebase/config';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { Link,useNavigate } from 'react-router-dom';
 
 const Signin = () => {
   const [email, setEmail] = useState('');
@@ -19,6 +19,16 @@ const Signin = () => {
       setError(err.message);
     }
   };
+  const handleGoogleSignin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      console.log('Google Sign-in successful! Redirecting to dashboard...');
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 relative">
@@ -62,17 +72,18 @@ const Signin = () => {
           Sign In
         </button>
       </form>
+      <Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot Password?</Link>
       <div className="flex justify-center mt-4">
           <span className="text-gray-500">OR</span>
         </div>
         <div className="mt-4">
-          <button className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full">
+          <button
+            className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full"
+            onClick={handleGoogleSignin}
+          >
             Sign in with Google
           </button>
-          <button className="enterprise-signup bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-md transition duration-300 w-full mt-2">
-            Enterprise Sign in
-          </button>
-        </div>
+          </div>
     </div>
   </div>
   );

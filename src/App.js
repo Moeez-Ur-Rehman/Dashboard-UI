@@ -6,6 +6,7 @@ import Footer from './component/Footer';
 import Signup from './component/Signup.jsx';
 import Signin from './component/Signin.jsx';
 import Dashboard from './component/Dashboard';
+import ForgotPassword from './component/ForgotPassword.jsx';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 
@@ -18,8 +19,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/signin" element={<Signin />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route
-            path="/dashboard"
+            path="/Dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
