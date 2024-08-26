@@ -1,12 +1,12 @@
 import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Navigate } from 'react-router-dom';
-import { auth } from '../firebase/config';  // Your Firebase config
+import { auth } from '../firebase/config';  // Your Firebase configuration
 
 const ProtectedRoute = ({ children }) => {
   const [user, loading] = useAuthState(auth);
 
-  // Show a loading screen while the auth state is being checked
+  // Show a loading screen while checking the authentication state
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/signin" />;
   }
 
-  // If the user is authenticated, render the child components (Dashboard in this case)
+  // If the user is authenticated, render the child components
   return children;
 };
 
