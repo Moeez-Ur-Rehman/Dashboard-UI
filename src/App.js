@@ -5,9 +5,11 @@ import Home from './component/Home';
 import Footer from './component/Footer';
 import Signup from './component/Signup.jsx';
 import Signin from './component/Signin.jsx';
+import GetStarted from './component/get-started.jsx';
 import ForgotPassword from './component/ForgotPassword.jsx';
-import Dashboard from './component/Dashboard'; // Import DashboardLayout and Overview
-import ProtectedRoute from './routes/ProtectedRoute';  // ProtectedRoute with Firebase auth check
+import Profile from './component/Profile.jsx';
+import Dashboard from './component/Dashboard';
+import ProtectedRoute from './routes/ProtectedRoute';
 
 const App = () => {
   return (
@@ -20,18 +22,25 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/signin" element={<Signin />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/get-started" element={<GetStarted />} />
 
           {/* Protected Routes */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Dashboard /> {/* Dashboard layout with nested routes */}
+                <Dashboard />
               </ProtectedRoute>
             }
           >
-            {/* Nested Routes */}
-            
             {/* Add other routes like /settings, /analytics here */}
           </Route>
         </Routes>

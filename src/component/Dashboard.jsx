@@ -1,9 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { doc, setDoc, collection, addDoc, getDocs } from 'firebase/firestore';
+import { auth, db, storage } from '../firebase/config'; // Ensure you import storage
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const Dashboard = () => {
   const [entries, setEntries] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswords, setShowPasswords] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editedEntry, setEditedEntry] = useState(null);
+
+  // Fetching user records from Firestore
+  useEffect(() => {
+    const fetchUserRecords = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const uid = user.uid;
+        const recordsSnapshot = await getDocs(collection(db, 'users', uid, 'records'));
+        const userRecords = recordsSnapshot.docs.map(doc => doc.data());
+        setEntries(userRecords);
+      }
+    };
+    fetchUserRecords();
+  }, []);
 
   const [newEntry, setNewEntry] = useState({
     name: '',
@@ -15,8 +35,27 @@ const Dashboard = () => {
     attachFiles: null,
   });
 
-  const handleAddEntry = () => {
-    setEntries([...entries, newEntry]);
+  const handleAddRecord = async (record) => {
+    const user = auth.currentUser;
+    if (user) {
+      const uid = user.uid;
+      const userDocRef = doc(db, 'users', uid);
+      const recordsCollectionRef = collection(userDocRef, 'records');
+      await addDoc(recordsCollectionRef, record);
+    }
+  };
+
+  const handleAddEntry = async () => {
+    // Handle file upload if file exists
+    let fileUrl = null;
+    if (newEntry.attachFiles) {
+      const storageRef = ref(storage, `users/${auth.currentUser.uid}/${newEntry.attachFiles.name}`);
+      await uploadBytes(storageRef, newEntry.attachFiles);
+      fileUrl = await getDownloadURL(storageRef);
+    }
+
+    const entryWithFileUrl = { ...newEntry, attachFiles: fileUrl };
+    setEntries([...entries, entryWithFileUrl]);
     setNewEntry({
       name: '',
       url: '',
@@ -26,6 +65,7 @@ const Dashboard = () => {
       shareWith: 'private',
       attachFiles: null,
     });
+    handleAddRecord(entryWithFileUrl);
   };
 
   const toggleShowPassword = () => {
@@ -45,11 +85,41 @@ const Dashboard = () => {
     setShowPasswords((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
+  const handleEditEntry = (index) => {
+    setIsEditing(true);
+    setEditIndex(index);
+    setEditedEntry({ ...entries[index] });
+  };
+
+  const handleSaveEdit = async () => {
+    const updatedEntries = [...entries];
+    updatedEntries[editIndex] = editedEntry;
+
+    // Save the updated record to Firestore
+    const user = auth.currentUser;
+    if (user) {
+      const uid = user.uid;
+      const recordDocRef = doc(db, 'users', uid, 'records', editedEntry.id); // Assuming the record has an ID
+      await setDoc(recordDocRef, editedEntry);
+    }
+
+    setEntries(updatedEntries);
+    resetEditingState();
+  };
+
+  const handleDiscardEdit = () => {
+    resetEditingState();
+  };
+
+  const resetEditingState = () => {
+    setIsEditing(false);
+    setEditIndex(null);
+    setEditedEntry(null);
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
-      
       <div className="max-w-screen-xl mx-auto p-6">
-        {/* Main content */}
         <main>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Records Section */}
@@ -61,22 +131,16 @@ const Dashboard = () => {
                 ) : (
                   entries.map((entry, index) => (
                     <li key={index} className="bg-gray-200 p-4 rounded-md">
-                      {entry.shareWith === 'private' ? (
-                        <>
-                          <div className="mb-2">
-                            <span className="font-semibold">Username:</span> {entry.username}
-                          </div>
-                        </>
-                      ) : (
+                      <div className="mb-2">
+                        <span className="font-semibold">Username:</span> {entry.username}
+                      </div>
+                      {entry.shareWith !== 'private' && (
                         <>
                           <div className="mb-2">
                             <span className="font-semibold">Name:</span> {entry.name}
                           </div>
                           <div className="mb-2">
                             <span className="font-semibold">URL:</span> {entry.url}
-                          </div>
-                          <div className="mb-2">
-                            <span className="font-semibold">Username:</span> {entry.username}
                           </div>
                           <div className="mb-2">
                             <span className="font-semibold">Password:</span>{' '}
@@ -99,11 +163,22 @@ const Dashboard = () => {
                           </div>
                           {entry.attachFiles && (
                             <div className="mb-2">
-                              <span className="font-semibold">Attached File:</span> {entry.attachFiles.name}
+                              <span className="font-semibold">Attached File:</span>{' '}
+                              <a href={entry.attachFiles} target="_blank" rel="noopener noreferrer">
+                                {entry.attachFiles.split('/').pop()}
+                              </a>
                             </div>
                           )}
                         </>
                       )}
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => handleEditEntry(index)}
+                          className="text-blue-500 hover:underline"
+                        >
+                          Edit
+                        </button>
+                      </div>
                     </li>
                   ))
                 )}
@@ -113,13 +188,7 @@ const Dashboard = () => {
             {/* Form Section */}
             <section className="lg:col-span-2 bg-white shadow-md rounded-lg p-6">
               <header className="flex justify-between items-center mb-6">
-                <h1 className="text-xl font-bold">Add Record</h1>
-                <button
-                  onClick={handleAddEntry}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
-                >
-                  + 
-                </button>
+                <h1 className="text-xl font-bold">{isEditing ? 'Edit Record' : 'Add Record'}</h1>
               </header>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -129,8 +198,12 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={newEntry.name}
-                    onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
+                    value={isEditing ? editedEntry.name : newEntry.name}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, name: e.target.value })
+                        : setNewEntry({ ...newEntry, name: e.target.value })
+                    }
                     placeholder="Record Name"
                   />
                 </div>
@@ -141,8 +214,12 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={newEntry.url}
-                    onChange={(e) => setNewEntry({ ...newEntry, url: e.target.value })}
+                    value={isEditing ? editedEntry.url : newEntry.url}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, url: e.target.value })
+                        : setNewEntry({ ...newEntry, url: e.target.value })
+                    }
                     placeholder="Login URL"
                   />
                 </div>
@@ -153,8 +230,12 @@ const Dashboard = () => {
                   <input
                     type="text"
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={newEntry.username}
-                    onChange={(e) => setNewEntry({ ...newEntry, username: e.target.value })}
+                    value={isEditing ? editedEntry.username : newEntry.username}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, username: e.target.value })
+                        : setNewEntry({ ...newEntry, username: e.target.value })
+                    }
                     placeholder="Username"
                   />
                 </div>
@@ -165,17 +246,23 @@ const Dashboard = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={newEntry.password}
-                    onChange={(e) => setNewEntry({ ...newEntry, password: e.target.value })}
+                    value={isEditing ? editedEntry.password : newEntry.password}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, password: e.target.value })
+                        : setNewEntry({ ...newEntry, password: e.target.value })
+                    }
                     placeholder="Password"
                   />
-                  <button
-                    type="button"
-                    onClick={generateRandomPassword}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gray-200 px-3 py-1 rounded text-sm"
-                  >
-                    Generate
-                  </button>
+                  {!isEditing && (
+                    <button
+                      type="button"
+                      onClick={generateRandomPassword}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-gray-200 px-3 py-1 rounded text-sm"
+                    >
+                      Generate
+                    </button>
+                  )}
                   <label className="flex items-center mt-2">
                     <input
                       type="checkbox"
@@ -192,8 +279,12 @@ const Dashboard = () => {
                   <label className="font-semibold text-gray-700 mb-2">Notes</label>
                   <textarea
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={newEntry.notes}
-                    onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
+                    value={isEditing ? editedEntry.notes : newEntry.notes}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, notes: e.target.value })
+                        : setNewEntry({ ...newEntry, notes: e.target.value })
+                    }
                     placeholder="Add your notes here"
                   />
                 </div>
@@ -207,20 +298,28 @@ const Dashboard = () => {
                       id="share-mur"
                       name="shareWith"
                       value="mur"
-                      checked={newEntry.shareWith === 'mur'}
-                      onChange={(e) => setNewEntry({ ...newEntry, shareWith: e.target.value })}
+                      checked={isEditing ? editedEntry.shareWith === 'mur' : newEntry.shareWith === 'mur'}
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditedEntry({ ...editedEntry, shareWith: e.target.value })
+                          : setNewEntry({ ...newEntry, shareWith: e.target.value })
+                      }
                       className="mr-2"
                     />
                     <label htmlFor="share-mur" className="mr-6">
-                      The Team 
+                      The Team
                     </label>
                     <input
                       type="radio"
                       id="share-private"
                       name="shareWith"
                       value="private"
-                      checked={newEntry.shareWith === 'private'}
-                      onChange={(e) => setNewEntry({ ...newEntry, shareWith: e.target.value })}
+                      checked={isEditing ? editedEntry.shareWith === 'private' : newEntry.shareWith === 'private'}
+                      onChange={(e) =>
+                        isEditing
+                          ? setEditedEntry({ ...editedEntry, shareWith: e.target.value })
+                          : setNewEntry({ ...newEntry, shareWith: e.target.value })
+                      }
                       className="mr-2"
                     />
                     <label htmlFor="share-private">
@@ -235,10 +334,44 @@ const Dashboard = () => {
                   <input
                     type="file"
                     className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    onChange={(e) => setNewEntry({ ...newEntry, attachFiles: e.target.files[0] })}
+                    onChange={(e) =>
+                      isEditing
+                        ? setEditedEntry({ ...editedEntry, attachFiles: e.target.files[0] })
+                        : setNewEntry({ ...newEntry, attachFiles: e.target.files[0] })
+                    }
                   />
                 </div>
               </div>
+
+              {/* Save and Discard buttons for editing */}
+              {isEditing && (
+                <div className="flex justify-end mt-6">
+                  <button
+                    onClick={handleDiscardEdit}
+                    className="bg-red-500 text-white px-4 py-2 rounded mr-4 hover:bg-red-600 transition-all"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    onClick={handleSaveEdit}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
+                  >
+                    Save
+                  </button>
+                </div>
+              )}
+
+              {/* Add button for adding new entries */}
+              {!isEditing && (
+                <div className="flex justify-end mt-6">
+                  <button
+                    onClick={handleAddEntry}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
+                  >
+                    Add Record
+                  </button>
+                </div>
+              )}
             </section>
           </div>
         </main>

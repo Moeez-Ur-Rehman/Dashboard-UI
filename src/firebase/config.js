@@ -2,6 +2,7 @@
 import { initializeApp, getApps,getApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';
 import { getAuth,GoogleAuthProvider } from 'firebase/auth'; 
+import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,7 +21,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
-
+const storage = getStorage(app, "dashboard-ui-63a6f.appspot.com");
 const googleProvider = new GoogleAuthProvider();
-export { auth,googleProvider };
+export { auth,googleProvider,storage };
 export const db = getFirestore(app);

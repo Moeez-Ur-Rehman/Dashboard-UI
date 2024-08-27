@@ -18,6 +18,7 @@ const Header = () => {
     setLoading(true); // Set loading to true when starting logout
     try {
       await signOut(auth);
+      localStorage.removeItem('authToken');
       navigate('/signin');
     } catch (error) {
       console.error(error);
@@ -51,6 +52,11 @@ const Header = () => {
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 md:justify-center md:items-center md:mt-0">
             {user ? (
               <>
+              <li>
+                  <Link to="/dashboard" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+                    Dashboard
+                  </Link>
+                </li>
                 <li>
                   <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
                     Profile
