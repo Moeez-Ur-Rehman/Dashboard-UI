@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { auth, googleProvider } from '../firebase/config';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { Link, useNavigate } from 'react-router-dom';
+import {Link, useNavigate } from 'react-router-dom';
+
+// Inside your login logic
+
 
 const Signin = () => {
   const [email, setEmail] = useState('');
@@ -13,10 +16,14 @@ const Signin = () => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken(); // Get the Firebase ID token
+      const user = userCredential.user;
+      const token = await user.getIdToken(true); // Force refresh of the token
       localStorage.setItem('authToken', token); // Store the token in local storage
       console.log('Sign-in successful! Redirecting to dashboard...');
-      navigate('/dashboard');
+      window.history.replaceState(null, null, '/dashboard');
+      window.location.href = '/dashboard';
+      navigate('/dashboard',{ replace: true });
+      
     } catch (err) {
       setError(err.message);
     }

@@ -13,12 +13,13 @@ const Header = () => {
   const toggleMenu = () => {
     setIsMenuOpen(prev => !prev);
   };
-
+  
   const handleLogout = async () => {
     setLoading(true); // Set loading to true when starting logout
     try {
       await signOut(auth);
       localStorage.removeItem('authToken');
+      console.log("signout sucessful");
       navigate('/signin');
     } catch (error) {
       console.error(error);

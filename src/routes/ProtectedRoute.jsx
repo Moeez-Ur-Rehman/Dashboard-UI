@@ -1,16 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { auth } from '../firebase/config';
 
 const ProtectedRoute = ({ children }) => {
-  const authToken = localStorage.getItem('authToken'); // Replace with your token key
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingStatus, setCheckingStatus] = useState(true);
 
-  if (!authToken) {
-    // If no token is found, redirect to the signin page
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        console.log('User is authenticated:', user);
+        setIsAuthenticated(true);
+      } else {
+        console.log('User is not authenticated.');
+        setIsAuthenticated(false);
+      }
+      setCheckingStatus(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (checkingStatus) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    console.log('Redirecting to signin');
     return <Navigate to="/signin" />;
   }
 
-  // If token exists, render the child components
   return children;
 };
+
 
 export default ProtectedRoute;

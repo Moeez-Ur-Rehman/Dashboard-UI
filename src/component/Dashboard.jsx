@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { doc, setDoc, collection, addDoc, getDocs } from 'firebase/firestore';
+import { onSnapshot, doc, setDoc, collection, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { auth, db, storage } from '../firebase/config'; // Ensure you import storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { FaEye,FaEyeSlash,FaEdit} from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
 const Dashboard = () => {
   const [entries, setEntries] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
@@ -10,20 +12,34 @@ const Dashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editedEntry, setEditedEntry] = useState(null);
-
+  const [user] = useAuthState(auth);
   // Fetching user records from Firestore
+  
   useEffect(() => {
-    const fetchUserRecords = async () => {
-      const user = auth.currentUser;
+    const fetchUserRecords = () => {
       if (user) {
         const uid = user.uid;
-        const recordsSnapshot = await getDocs(collection(db, 'users', uid, 'records'));
-        const userRecords = recordsSnapshot.docs.map(doc => doc.data());
-        setEntries(userRecords);
+  
+        // Set up a listener for real-time updates using onSnapshot
+        const unsubscribe = onSnapshot(collection(db, 'users', uid, 'records'), (snapshot) => {
+          const userRecords = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setEntries(userRecords);
+        });
+  
+        // Cleanup function to unsubscribe from the listener when the component unmounts
+        return () => unsubscribe();
       }
     };
+  
     fetchUserRecords();
-  }, []);
+  }, [user]); // Dependency array should include 'user' to re-run when user changes
+  
+
+ 
+  
 
   const [newEntry, setNewEntry] = useState({
     name: '',
@@ -35,20 +51,20 @@ const Dashboard = () => {
     attachFiles: null,
   });
 
-  const handleAddRecord = async (record) => {
-    const user = auth.currentUser;
-    if (user) {
-      const uid = user.uid;
-      const userDocRef = doc(db, 'users', uid);
-      const recordsCollectionRef = collection(userDocRef, 'records');
-      await addDoc(recordsCollectionRef, record);
-    }
+   const handleAddRecord = async (record) => {
+     const user = auth.currentUser;
+     if (user) {
+       const uid = user.uid;
+       const userDocRef = doc(db, 'users', uid);
+       const recordsCollectionRef = collection(userDocRef, 'records');
+       await addDoc(recordsCollectionRef, record);
+     }
   };
 
   const handleAddEntry = async () => {
     // Handle file upload if file exists
     let fileUrl = null;
-    if (newEntry.attachFiles) {
+    if (newEntry.attachFiles ) {
       const storageRef = ref(storage, `users/${auth.currentUser.uid}/${newEntry.attachFiles.name}`);
       await uploadBytes(storageRef, newEntry.attachFiles);
       fileUrl = await getDownloadURL(storageRef);
@@ -94,18 +110,68 @@ const Dashboard = () => {
   const handleSaveEdit = async () => {
     const updatedEntries = [...entries];
     updatedEntries[editIndex] = editedEntry;
-
+console.log(entries,editedEntry,updatedEntries);
     // Save the updated record to Firestore
     const user = auth.currentUser;
     if (user) {
       const uid = user.uid;
-      const recordDocRef = doc(db, 'users', uid, 'records', editedEntry.id); // Assuming the record has an ID
-      await setDoc(recordDocRef, editedEntry);
+  
+      // Fetch all records in the collection
+      const recordsSnapshot = await getDocs(collection(db, 'users', uid, 'records'));
+      
+      // Find the document that matches the edited entry
+      const recordDoc = recordsSnapshot.docs.find(doc => doc.data().username === editedEntry.username);
+  
+      if (recordDoc) {
+        const editID = recordDoc.id; // Get the document ID
+  
+        // Reference to the document
+        const recordDocRef = doc(db, 'users', uid, 'records', editID);
+        
+        // Update the document with new data
+        await setDoc(recordDocRef, editedEntry);
+        
+        console.log(`Updated record with ID: ${editID}`);
+      } else {
+        console.log('No matching record found for update.');
+      }
     }
+  
 
     setEntries(updatedEntries);
     resetEditingState();
   };
+  const handledelete = async () => {
+    const updatedEntries = [...entries];
+  updatedEntries.splice(editIndex, 1);
+  setEntries(updatedEntries);
+console.log(entries,editedEntry,updatedEntries);
+    // Save the updated record to Firestore
+    const user = auth.currentUser;
+    if (user) {
+      const uid = user.uid;
+  
+      // Fetch all records in the collection
+      const recordsSnapshot = await getDocs(collection(db, 'users', uid, 'records'));
+      
+      // Find the document that matches the edited entry
+      const recordDoc = recordsSnapshot.docs.find(doc => doc.data().username === editedEntry.username);
+  
+      if (recordDoc) {
+        const editID = recordDoc.id; // Get the document ID
+  
+        // Reference to the document
+        const recordDocRef = doc(db, 'users', uid, 'records', editID);
+        
+        // Update the document with new data
+        await deleteDoc(recordDocRef);
+        
+        console.log(`Updated record with ID: ${editID}`);
+      } else {
+        console.log('No matching record found for update.');
+      }
+    }
+  }
 
   const handleDiscardEdit = () => {
     resetEditingState();
@@ -125,7 +191,7 @@ const Dashboard = () => {
             {/* Records Section */}
             <section className="lg:col-span-1 bg-white shadow-md rounded-lg p-4">
               <h2 className="text-xl font-semibold mb-4">Records</h2>
-              <ul className="space-y-4 max-h-96 overflow-y-auto">
+              <ul className="space-y-4 text-balance max-h-96 overflow-y-auto ">
                 {entries.length === 0 ? (
                   <li className="text-gray-500">No records available</li>
                 ) : (
@@ -140,7 +206,7 @@ const Dashboard = () => {
                             <span className="font-semibold">Name:</span> {entry.name}
                           </div>
                           <div className="mb-2">
-                            <span className="font-semibold">URL:</span> {entry.url}
+                            <span className="font-semibold">URL:</span><p className="break-words">{entry.url}</p> 
                           </div>
                           <div className="mb-2">
                             <span className="font-semibold">Password:</span>{' '}
@@ -155,7 +221,7 @@ const Dashboard = () => {
                               onClick={() => toggleEntryPasswordVisibility(index)}
                               className="text-blue-500 ml-2"
                             >
-                              {showPasswords[index] ? 'Hide' : 'Show'}
+                              {showPasswords[index] ? <FaEyeSlash /> : <FaEye />}
                             </button>
                           </div>
                           <div className="mb-2">
@@ -171,12 +237,12 @@ const Dashboard = () => {
                           )}
                         </>
                       )}
-                      <div className="flex justify-end">
+                      <div className="flex justify-end ">
                         <button
                           onClick={() => handleEditEntry(index)}
-                          className="text-blue-500 hover:underline"
+                          className="text-blue-500 text-xl "
                         >
-                          Edit
+                          <FaEdit />
                         </button>
                       </div>
                     </li>
@@ -347,10 +413,16 @@ const Dashboard = () => {
               {isEditing && (
                 <div className="flex justify-end mt-6">
                   <button
-                    onClick={handleDiscardEdit}
-                    className="bg-red-500 text-white px-4 py-2 rounded mr-4 hover:bg-red-600 transition-all"
+                    onClick={handledelete}
+                    className="bg-red-500 text-white px-4 py-2 rounded ml-4 hover:bg-red-600 transition-all "
                   >
-                    Discard
+                    <MdDeleteOutline />
+                  </button>
+                  <button
+                    onClick={handleDiscardEdit}
+                    className="bg-white border border-bg-black text-black px-4 py-2 rounded mr-4 ml-4 hover:bg-blue-100 transition-all"
+                  >
+                    Cancel
                   </button>
                   <button
                     onClick={handleSaveEdit}
@@ -358,6 +430,7 @@ const Dashboard = () => {
                   >
                     Save
                   </button>
+                  
                 </div>
               )}
 
