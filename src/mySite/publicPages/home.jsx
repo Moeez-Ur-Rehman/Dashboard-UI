@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 
 
 const Home = () => {
   const [isMobile, setIsMobile] = useState(false);
-
+  const navigate = useNavigate();
+  
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024); // lg breakpoint is 1024px
@@ -281,12 +290,6 @@ const Home = () => {
     </button>
   </div>
 </section>
-
-
-
-
-
-
       {/* Additional Features Section can be added here */}
     </div>
   );

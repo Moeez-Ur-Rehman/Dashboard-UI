@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { onSnapshot, doc, setDoc, collection, addDoc, getDocs, deleteDoc } from 'firebase/firestore';
-import { auth, db, storage } from '../firebase/config'; // Ensure you import storage
+import { auth, db, storage } from '../../firebase/config'; // Ensure you import storage
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { FaEye,FaEyeSlash,FaEdit} from "react-icons/fa";
@@ -37,10 +37,6 @@ const Dashboard = () => {
     fetchUserRecords();
   }, [user]); // Dependency array should include 'user' to re-run when user changes
   
-
- 
-  
-
   const [newEntry, setNewEntry] = useState({
     name: '',
     url: '',
@@ -63,6 +59,13 @@ const Dashboard = () => {
 
   const handleAddEntry = async () => {
     // Handle file upload if file exists
+    const { name, url, username, password } = newEntry;
+
+    // Check if all required fields are filled
+    if (!name || !url || !username || !password) {
+      alert("Please fill in all required fields: Name, URL, Username, and Password.");
+      return;
+    }
     let fileUrl = null;
     if (newEntry.attachFiles ) {
       const storageRef = ref(storage, `users/${auth.currentUser.uid}/${newEntry.attachFiles.name}`);
@@ -108,6 +111,13 @@ const Dashboard = () => {
   };
 
   const handleSaveEdit = async () => {
+    const { name, url, username, password } = editedEntry;
+
+    // Check if all required fields are filled
+    if (!name || !url || !username || !password) {
+      alert("Please fill in all required fields: Name, URL, Username, and Password.");
+      return;
+    }
     const updatedEntries = [...entries];
     updatedEntries[editIndex] = editedEntry;
 console.log(entries,editedEntry,updatedEntries);
@@ -190,7 +200,7 @@ console.log(entries,editedEntry,updatedEntries);
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Records Section */}
             <section className="lg:col-span-1 bg-white shadow-md rounded-lg p-4">
-              <h2 className="text-xl font-semibold mb-4">Records</h2>
+              <h2 className="text-2xl font-bold mb-4">Records</h2>
               <ul className="space-y-4 text-balance max-h-96 overflow-y-auto ">
                 {entries.length === 0 ? (
                   <li className="text-gray-500">No records available</li>
@@ -254,22 +264,25 @@ console.log(entries,editedEntry,updatedEntries);
             {/* Form Section */}
             <section className="lg:col-span-2 bg-white shadow-md rounded-lg p-6">
               <header className="flex justify-between items-center mb-6">
-                <h1 className="text-xl font-bold">{isEditing ? 'Edit Record' : 'Add Record'}</h1>
+                <h1 className="text-2xl font-bold">{isEditing ? 'Edit Record' : 'Add Record'}</h1>
               </header>
-
+                
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name Input */}
                 <div className="flex flex-col">
                   <label className="font-semibold text-gray-700 mb-2">Name</label>
                   <input
                     type="text"
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={isEditing ? editedEntry.name : newEntry.name}
                     onChange={(e) =>
                       isEditing
                         ? setEditedEntry({ ...editedEntry, name: e.target.value })
                         : setNewEntry({ ...newEntry, name: e.target.value })
                     }
+                        name="name"
+                        required
+                    
                     placeholder="Record Name"
                   />
                 </div>
@@ -279,7 +292,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <label className="font-semibold text-gray-700 mb-2">Login URL</label>
                   <input
                     type="text"
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={isEditing ? editedEntry.url : newEntry.url}
                     onChange={(e) =>
                       isEditing
@@ -295,7 +308,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <label className="font-semibold text-gray-700 mb-2">Username</label>
                   <input
                     type="text"
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={isEditing ? editedEntry.username : newEntry.username}
                     onChange={(e) =>
                       isEditing
@@ -311,7 +324,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <label className="font-semibold text-gray-700 mb-2">Password</label>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={isEditing ? editedEntry.password : newEntry.password}
                     onChange={(e) =>
                       isEditing
@@ -344,7 +357,7 @@ console.log(entries,editedEntry,updatedEntries);
                 <div className="flex flex-col md:col-span-2">
                   <label className="font-semibold text-gray-700 mb-2">Notes</label>
                   <textarea
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={isEditing ? editedEntry.notes : newEntry.notes}
                     onChange={(e) =>
                       isEditing
@@ -399,7 +412,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <label className="font-semibold text-gray-700 mb-2">Attach files</label>
                   <input
                     type="file"
-                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={(e) =>
                       isEditing
                         ? setEditedEntry({ ...editedEntry, attachFiles: e.target.files[0] })
@@ -408,7 +421,6 @@ console.log(entries,editedEntry,updatedEntries);
                   />
                 </div>
               </div>
-
               {/* Save and Discard buttons for editing */}
               {isEditing && (
                 <div className="flex justify-end mt-6">
@@ -426,7 +438,7 @@ console.log(entries,editedEntry,updatedEntries);
                   </button>
                   <button
                     onClick={handleSaveEdit}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
                   >
                     Save
                   </button>
@@ -439,7 +451,7 @@ console.log(entries,editedEntry,updatedEntries);
                 <div className="flex justify-end mt-6">
                   <button
                     onClick={handleAddEntry}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-all"
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
                   >
                     Add Record
                   </button>
