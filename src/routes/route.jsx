@@ -8,7 +8,7 @@ import GetStarted from "../features/auth/getStarted";
 import UserProfile from "../features/dashboard/profile";
 import Dashboard from "../features/dashboard/dashBoard";
 import NotFound from "../features/home/notFound";
-import ProtectedRoute from "./protectedRoute";
+import ProtectedRoute from "s";
 
 export const allroutes = () => {
   return (
