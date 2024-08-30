@@ -40,13 +40,11 @@ const UserProfile = () => {
       {/* Basic Info Section */}
       <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '20px', marginBottom: '20px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
         <h2 style={{ fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Basic Info</h2>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <img src={profileData.image} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', marginRight: '20px' }} />
-            <div>
-              <h3 style={{ fontSize: '20px', margin: '0' }}>{profileData.name}</h3>
-              <p style={{ margin: '0', color: '#888' }}>ID: {profileData.id}</p>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <img src={profileData.image} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', marginBottom: '20px' }} />
+          <div>
+            <h3 style={{ fontSize: '20px', margin: '0' }}>{profileData.name}</h3>
+            <p style={{ margin: '0', color: '#888' }}>ID: {profileData.id}</p>
           </div>
           <button
             style={{
@@ -59,6 +57,7 @@ const UserProfile = () => {
               display: 'flex',
               alignItems: 'center',
               fontWeight: 'bold',
+              marginTop: '20px',
             }}
             onClick={changePassword}
           >
@@ -66,8 +65,8 @@ const UserProfile = () => {
           </button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-          <div style={{ flex: '1', marginRight: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>First Name:</label>
             <input
               type="text"
@@ -82,7 +81,7 @@ const UserProfile = () => {
               }}
             />
           </div>
-          <div style={{ flex: '1', marginLeft: '10px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>Last Name:</label>
             <input
               type="text"
@@ -97,10 +96,7 @@ const UserProfile = () => {
               }}
             />
           </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-          <div style={{ flex: '1', marginRight: '10px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>Department:</label>
             <input
               type="text"
@@ -115,7 +111,7 @@ const UserProfile = () => {
               }}
             />
           </div>
-          <div style={{ flex: '1', marginLeft: '10px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>Position:</label>
             <input
               type="text"
@@ -130,10 +126,7 @@ const UserProfile = () => {
               }}
             />
           </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-          <div style={{ flex: '1', marginRight: '10px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>Hired Date:</label>
             <input
               type="text"
@@ -148,7 +141,7 @@ const UserProfile = () => {
               }}
             />
           </div>
-          <div style={{ flex: '1', marginLeft: '10px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <label style={{ color: '#555', fontWeight: 'bold' }}>Birth Date:</label>
             <input
               type="text"
@@ -167,12 +160,12 @@ const UserProfile = () => {
       </div>
 
       {/* Contacts and Address Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* Contacts Card */}
-        <div style={{ flex: '1', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
+        <div style={{ padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Contacts</h3>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-            <i className="fas fa-phone" style={{ fontSize: '24px', marginRight: '10px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '10px' }}>
+            <i className="fas fa-phone" style={{ fontSize: '24px', marginBottom: '10px' }} />
             <div>
               <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>{formatPhone(profileData.phone)}</p>
               <p style={{ margin: '0', color: '#888' }}>{profileData.email}</p>
@@ -181,10 +174,10 @@ const UserProfile = () => {
         </div>
 
         {/* Address Card */}
-        <div style={{ flex: '1', padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
+        <div style={{ padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Address</h3>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-            <i className="fas fa-map-marker-alt" style={{ fontSize: '24px', marginRight: '10px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '10px' }}>
+            <i className="fas fa-map-marker-alt" style={{ fontSize: '24px', marginBottom: '10px' }} />
             <div>
               <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
                 {profileData.address}, {profileData.city}, {profileData.state}, {profileData.country}
@@ -206,6 +199,9 @@ const UserProfile = () => {
           borderRadius: '8px',
           boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
           zIndex: 1000,
+          maxWidth: '90%',
+          width: '400px',
+          textAlign: 'center'
         }}>
           <h3>Change Password</h3>
           <button
@@ -214,18 +210,10 @@ const UserProfile = () => {
               backgroundColor: '#dc3545',
               color: '#fff',
               border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              marginTop: '16px'
-            }}
-            onClick={() => setIsChangedPasswordPopupOpened(false)}
-          >
-            Close
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
+              borderRadius: '4px', cursor: 'pointer', marginTop: '16px' }} onClick={() => setIsChangedPasswordPopupOpened(false)} >
+                 Close </button>
+               </div> )} 
+              </div> ); 
+          };
 
 export default UserProfile;

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { auth, googleProvider } from '../../firebase/config';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { Link, useNavigate } from 'react-router-dom';
+import { redirectToDashboardIfAuthenticated,redirectToDashboardAfterAuthentication } from '../../utilities/auth';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -9,7 +10,9 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
+  useEffect(() => {
+    redirectToDashboardIfAuthenticated(navigate);
+  }, [navigate]);
   const validateSignUp = () => {
 
     // Basic validation checks
@@ -43,8 +46,7 @@ const Signup = () => {
       const userCredential=await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const token = await user.getIdToken(true); // Force refresh of the token
-      localStorage.setItem('authToken', token);
-      navigate("/dashboard");
+      redirectToDashboardAfterAuthentication(navigate,token);
     } catch (err) {
       setError(err.message);
     }

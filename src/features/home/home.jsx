@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate,Link } from 'react-router-dom';
-
+import { redirectToDashboardIfAuthenticated } from '../../utilities/auth';
 
 const Home = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -8,10 +8,7 @@ const Home = () => {
   
   // Redirect to dashboard if already authenticated
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      navigate('/dashboard', { replace: true });
-    }
+    redirectToDashboardIfAuthenticated(navigate);
   }, [navigate]);
   
   useEffect(() => {
@@ -282,12 +279,13 @@ const Home = () => {
     <p className="text-white text-lg mb-8">
       TeamPassword is the fastest, easiest and most secure way to store and share team logins and passwords.
     </p>
+    <Link to='/get-started'>
     <button
-      to="/get-started"
       className="block mx-auto w-full sm:w-auto rounded bg-white px-6 py-3 text-sm font-medium text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring active:bg-blue-500"
     >
       Get Started
     </button>
+    </Link>
   </div>
 </section>
       {/* Additional Features Section can be added here */}

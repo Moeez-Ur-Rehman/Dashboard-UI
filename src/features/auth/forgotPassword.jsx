@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase/config';
-
+import { useNavigate } from 'react-router-dom';
+import { redirectToDashboardIfAuthenticated} from '../../utilities/auth';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const navigate=useNavigate();
+  useEffect(() => {
+    redirectToDashboardIfAuthenticated(navigate);
+  }, [navigate]);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();

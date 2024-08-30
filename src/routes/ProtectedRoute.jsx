@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     console.log('Redirecting to signin');
-    return <Navigate to="/signin" />;
+    return <Navigate to="/signin" replace/>;
   }
 
   return children;

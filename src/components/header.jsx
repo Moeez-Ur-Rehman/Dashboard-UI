@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebase/config';
+import { auth } from '../firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-
+import { logoutUser } from '../utilities/auth';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false); // Added loading state
@@ -18,9 +18,7 @@ const Header = () => {
     setLoading(true); // Set loading to true when starting logout
     try {
       await signOut(auth);
-      localStorage.removeItem('authToken');
-      console.log("signout sucessful");
-      navigate('/signin');
+      logoutUser(navigate);
     } catch (error) {
       console.error(error);
     } finally {

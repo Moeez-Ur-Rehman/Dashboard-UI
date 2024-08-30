@@ -2,7 +2,7 @@ import React, { useState , useEffect} from 'react';
 import { auth, googleProvider } from '../../firebase/config';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import {Link, useNavigate } from 'react-router-dom';
-
+import { redirectToDashboardIfAuthenticated,redirectToDashboardAfterAuthentication } from '../../utilities/auth';
 // Inside your login logic
 
 
@@ -12,10 +12,7 @@ const Signin = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   useEffect(() => {
-    const authToken = localStorage.getItem('authToken');
-    if (authToken) {
-      navigate('/dashboard', { replace: true });
-    }
+    redirectToDashboardIfAuthenticated(navigate);
   }, [navigate]);
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -23,9 +20,7 @@ const Signin = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const token = await user.getIdToken(true); // Force refresh of the token
-      localStorage.setItem('authToken', token); // Store the token in local storage
-      console.log('Sign-in successful! Redirecting to dashboard...');
-      navigate('/dashboard',{ replace: true });
+      redirectToDashboardAfterAuthentication(navigate,token);
       
     } catch (err) {
       setError("Incorrect Password");

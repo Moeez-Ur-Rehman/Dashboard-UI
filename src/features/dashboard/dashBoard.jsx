@@ -176,10 +176,11 @@ console.log(entries,editedEntry,updatedEntries);
         // Update the document with new data
         await deleteDoc(recordDocRef);
         
-        console.log(`Updated record with ID: ${editID}`);
+        
       } else {
-        console.log('No matching record found for update.');
+        console.log("record not deleted")
       }
+      resetEditingState();
     }
   }
 
@@ -206,7 +207,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <li className="text-gray-500">No records available</li>
                 ) : (
                   entries.map((entry, index) => (
-                    <li key={index} className="bg-gray-200 p-4 rounded-md">
+                    <li key={index} className="bg-blue-100 p-4 rounded-md">
                       <div className="mb-2">
                         <span className="font-semibold">Username:</span> {entry.username}
                       </div>
