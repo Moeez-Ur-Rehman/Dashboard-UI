@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate,Link } from 'react-router-dom';
 import { redirectToDashboardIfAuthenticated } from '../../utilities/auth';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+
+
 
 const Home = () => {
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   
+  
   // Redirect to dashboard if already authenticated
   useEffect(() => {
     redirectToDashboardIfAuthenticated(navigate);
   }, [navigate]);
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+  }, []);
   
   useEffect(() => {
     const handleResize = () => {
@@ -26,66 +34,65 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="relative bg-blue-500 bg-cover bg-center bg-no-repeat">
-        <div className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:flex lg:h-screen lg:items-center lg:px-8">
-          <div className="max-w-xl text-left sm:text-left">
-            <h1 className="text-3xl text-white font-bold sm:text-5xl">
-              The Password Manager for Teams
-              <strong className="block font-bold text-white">
-                Fast, Secure & Easy.
-              </strong>
-            </h1>
+  <div className="relative mx-auto max-w-screen-xl px-4 py-32 sm:px-6 lg:px-8 lg:flex lg:items-center lg:justify-between lg:h-screen ">
+    
+    {/* Text Section */}
+    <div className="max-w-xl text-left space-y-4"data-aos="fade-right">
+      <h1 className="text-3xl text-white font-bold sm:text-5xl">
+        The Password Manager
+        <strong className="block font-bold text-white mt-2">
+          for Teams
+        </strong>
+      </h1>
 
-            <p className="mt-4 text-white max-w-lg sm:text-xl/relaxed">
-              TeamPassword is the fastest, easiest, and most secure way to store and share team logins and passwords.
-            </p>
+      <p className="mt-4 text-white max-w-lg sm:text-xl/relaxed">
+        TeamPassword is the fastest, easiest, and most secure way to store and share team logins and passwords.
+      </p>
 
-            <div className="mt-8 flex flex-wrap gap-4 text-center">
-              <Link
-                to="/get-started"
-                className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
-              >
-                Get Started
-              </Link>
-              <Link
-                to="/learn-more"
-                className="block w-full rounded bg-white px-12 py-3 text-sm font-medium text-blue-500 shadow hover:text-blue-600 focus:outline-none focus:ring active:text-black sm:w-auto"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
+      <div className="mt-8 flex flex-wrap gap-4 text-center"data-aos="fade-up">
+        <Link
+          to="/get-started"
+          className="block w-full rounded-lg bg-white px-12 py-3 text-sm font-medium text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
+        >
+          Get Started
+        </Link>
+        
+      </div>
+    </div>
 
-          {!isMobile && (<div className="relative lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2 lg:flex lg:items-center lg:justify-center">
-            
-            <img
-              src="https://teampassword.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhomepage-hero1.7b445e2c.png&w=1080&q=75"
-              alt="TeamPassword App"
-              className="object-cover object-center w-full h-auto lg:w-2/3 lg:h-auto rounded-3xl shadow-lg"
-            />
-            
-            
-              <img
-                src="https://teampassword.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhomepage-hero2.c61ec3a8.png&w=640&q=75"
-                alt="TeamPassword App"
-                className="object-cover object-center w-full h-auto lg:w-1/2 lg:h-auto rounded-3xl shadow-lg absolute top-1/2 left-1/2 transform lg:-translate-x-1/3 lg:-translate-y-1/3"
-              />
-            
-          </div>
-          )}
+    {/* Image Section */}
+    {!isMobile && (
+      <div className="relative hidden lg:flex lg:w-1/2 lg:items-center lg:justify-center">
+        <div className="relative lg:w-2/3">
+          <img
+            src="https://teampassword.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhomepage-hero1.7b445e2c.png&w=1080&q=75"
+            alt="TeamPassword App"
+            className="object-cover object-center w-full h-auto rounded-3xl shadow-lg transform scale-105"
+            style={{ zIndex: 10 }}
+          />
+          <img
+            src="https://teampassword.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhomepage-hero2.c61ec3a8.png&w=640&q=75"
+            alt="TeamPassword App"
+            className="object-cover object-center w-full h-auto rounded-3xl shadow-lg absolute top-1/2 left-1/2 transform -translate-x-1/3 -translate-y-1/3 scale-90"
+            style={{ zIndex: 5 }}
+          />
         </div>
-      </section>
+      </div>
+    )}
+  </div>
+</section>
 
    {/*Features Section*/}
 <section className="bg-white dark:bg-gray-900">
-  <div className="container px-6 py-10 mx-auto">
-    <div className="container px-6 py-10 mx-auto flex flex-col items-center text-center">
+  <div className="container px-6 py-10 mx-auto ">
+    <div className="container px-6 py-10 mx-auto flex flex-col items-center text-center"data-aos="fade-up">
       <h1 className="text-4xl font-semibold text-gray-800 capitalize lg:text-4xl dark:text-white">
         Your Team,<br /> Secure <span className="underline decoration-blue-500">and in sync</span>
       </h1>
     </div>
     
-    <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-12 md:grid-cols-2 xl:grid-cols-3">
-      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+    <div className="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-12 md:grid-cols-2 xl:grid-cols-3 updateFeatures">
+      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl"data-aos="fade-right">
         <span className="inline-block text-blue-500 dark:text-blue-400">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
@@ -98,7 +105,7 @@ const Home = () => {
         </p>
       </div>
 
-      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl"data-aos="fade-up">
         <span className="inline-block text-blue-500 dark:text-blue-400">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
@@ -110,7 +117,7 @@ const Home = () => {
         </p>
       </div>
 
-      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl">
+      <div className="p-8 space-y-3 border-2 border-blue-400 dark:border-blue-300 rounded-xl"data-aos="fade-left">
         <span className="inline-block text-blue-500 dark:text-blue-400">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -142,15 +149,15 @@ const Home = () => {
 <section className="py-24">
   <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div className="flex justify-center items-center gap-y-8 lg:gap-y-0 flex-wrap md:flex-wrap lg:flex-nowrap lg:flex-row lg:justify-between lg:gap-x-8 max-w-sm sm:max-w-2xl lg:max-w-full mx-auto">
-      <div className="w-full lg:w-2/5">
-        <span className="text-sm text-gray-500 font-medium mb-4 block">Testimonial</span>
+      <div className="w-full lg:w-2/5" data-aos="fade-right">
+        <span className="text-sm text-gray-700 font-semibold mb-4 block">Testimonial</span> {/* Made the text slightly darker and bolder */}
         <h2 className="text-4xl font-bold text-gray-900 leading-[3.25rem] mb-8">
-        Customers Around the World Love and Trust{' '}
+          Customers Around the World Love and Trust{' '}
           <span className="text-blue-500">
-          TeamPassword
+            TeamPassword
           </span>
         </h2>
-        <div className="flex items-center justify-center lg:justify-start gap-10">
+        <div className="flex items-center justify-center lg:justify-center gap-5 mt-6"> {/* Centering the buttons */}
           <button
             id="slider-button-left"
             className="group flex justify-center items-center border border-solid border-blue-500 w-12 h-12 transition-all duration-500 rounded-lg hover:bg-blue-500"
@@ -192,10 +199,10 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="w-full lg:w-3/5">
+      <div className="w-full lg:w-3/5 ">
         {/* Testimonial Cards */}
         <div className="space-y-8">
-          <div className="group bg-white border border-solid border-gray-300 rounded-2xl max-sm:max-w-sm max-sm:mx-auto p-6 transition-all duration-500 hover:border-blue-500">
+          <div className="group bg-white border border-solid border-gray-300 rounded-2xl max-sm:max-w-sm max-sm:mx-auto p-6 transition-all duration-500 hover:border-blue-500"data-aos="fade-down">
             <div className="flex items-center gap-5 mb-5 sm:mb-9">
               <img
                 className="rounded-full"
@@ -230,7 +237,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="group bg-white border border-solid border-gray-300 rounded-2xl max-sm:max-w-sm max-sm:mx-auto p-6 transition-all duration-500 hover:border-blue-500">
+          <div className="group bg-white border border-solid border-gray-300 rounded-2xl max-sm:max-w-sm max-sm:mx-auto p-6 transition-all duration-500 hover:border-blue-500"data-aos="fade-up">
             <div className="flex items-center gap-5 mb-5 sm:mb-9">
               <img
                 className="rounded-full"
@@ -272,7 +279,7 @@ const Home = () => {
 
 {/*Ending*/}
 <section className="bg-blue-500 text-center py-24">
-  <div className="max-w-3xl mx-auto px-4">
+  <div className="max-w-3xl mx-auto px-4"data-aos="zoom-in">
     <h1 className="text-4xl font-bold text-white mb-4">
       The Password Manager for Teams
     </h1>
@@ -281,7 +288,7 @@ const Home = () => {
     </p>
     <Link to='/get-started'>
     <button
-      className="block mx-auto w-full sm:w-auto rounded bg-white px-6 py-3 text-sm font-medium text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring active:bg-blue-500"
+      className="block mx-auto w-full sm:w-auto rounded-lg bg-white px-6 py-3 text-sm font-medium text-blue-500 hover:bg-blue-100 focus:outline-none focus:ring active:bg-blue-500"
     >
       Get Started
     </button>

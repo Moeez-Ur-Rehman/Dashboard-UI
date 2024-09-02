@@ -1,3 +1,6 @@
 .navbar-layout-custom{
     max-width: 90% !important;
 }
+.heading{
+    padding-left: inherit;
+}

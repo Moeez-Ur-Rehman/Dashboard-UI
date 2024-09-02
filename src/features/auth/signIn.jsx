@@ -3,17 +3,26 @@ import { auth, googleProvider } from '../../firebase/config';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import {Link, useNavigate } from 'react-router-dom';
 import { redirectToDashboardIfAuthenticated,redirectToDashboardAfterAuthentication } from '../../utilities/auth';
+import { FcGoogle } from 'react-icons/fc';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 // Inside your login logic
-
-
 const Signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
     redirectToDashboardIfAuthenticated(navigate);
   }, [navigate]);
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+  }, []);
+    const togglePasswordVisibility = () => {
+      setShowPassword(!showPassword);
+    };
   const handleSignin = async (e) => {
     e.preventDefault();
     try {
@@ -41,7 +50,7 @@ const Signin = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 relative">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg"data-aos="zoom-in">
         <h2 className="text-2xl font-bold text-center mb-6">Sign In</h2>
         <form onSubmit={handleSignin}>
           <div className="mb-4">
@@ -59,19 +68,29 @@ const Signin = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Type Password"
-              required
-            />
-          </div>
+      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+        Password
+      </label>
+      <div className="relative">
+        <input
+          type={showPassword ? 'text' : 'password'}
+          id="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Type Password"
+          required
+        />
+        <button
+          type="button"
+          onClick={togglePasswordVisibility}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-500"
+        >
+          {showPassword ? <FaEyeSlash/> : <FaEye/>} 
+        </button>
+      </div>
+    </div>
+
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <button
@@ -86,13 +105,14 @@ const Signin = () => {
           <span className="text-gray-500">OR</span>
         </div>
         <div className="mt-4">
-          <button
-            className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full"
-            onClick={handleGoogleSignin}
-          >
-            Sign in with Google
-          </button>
-        </div>
+        <button
+        className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
+        onClick={handleGoogleSignin}
+       >
+      <FcGoogle size={20} className="mr-2" />
+      Sign in with Google
+      </button>
+</div>
       </div>
     </div>
   );

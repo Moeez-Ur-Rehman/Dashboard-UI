@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-
+import { PopInEffects } from '../../utilities/aos';
 // Helper function to format phone number
 const formatPhone = (value) => {
   return String(value).replace(/(\d{3})(\d{3})(\d{4})/, '+1($1)$2-$3');
@@ -7,6 +7,7 @@ const formatPhone = (value) => {
 
 // Main Profile Component
 const UserProfile = () => {
+  PopInEffects()
   const [profileData, setProfileData] = useState({
     id: '22',
     name: 'Amelia Harper',
@@ -36,7 +37,7 @@ const UserProfile = () => {
   }, []);
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}data-aos="zoom in">
       {/* Basic Info Section */}
       <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '20px', marginBottom: '20px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
         <h2 style={{ fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Basic Info</h2>

@@ -29,13 +29,20 @@ const Header = () => {
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 shadow-md">
       <div className="max-w-screen-xl mx-auto p-4 flex flex-wrap items-center justify-between">
-        {user?(<div className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Link to="/dashboard" className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">MySite</Link>
-        </div>):(<div className="flex items-center space-x-3 rtl:space-x-reverse">
-          <Link to="/" className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">MySite</Link>
-        </div>)}
-        
-
+        {user ? (
+          <div className="flex items-center space-x-3 rtl:space-x-reverse heading">
+            <Link to="/dashboard" className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              MySite
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-3 rtl:space-x-reverse heading">
+            <Link to="/" className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+              MySite
+            </Link>
+          </div>
+        )}
+  
         <button
           data-collapse-toggle="navbar-default"
           type="button"
@@ -49,8 +56,9 @@ const Header = () => {
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
           </svg>
         </button>
-        <div className={`w-full  md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
-          <ul className="font-medium flex flex-col  p-4 md:p-0 mt-4 md:flex-row md:space-x-8 md:justify-center md:items-center md:mt-0">
+  
+        <div className={`w-full md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 md:justify-end md:items-center md:mt-0">
             {user ? (
               <>
                 <li>
@@ -76,12 +84,12 @@ const Header = () => {
             ) : (
               <>
                 <li>
-                  <Link to="/signin" className="block py-2 px-3  text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+                  <Link to="/signin" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
                     Sign In
                   </Link>
                 </li>
                 <li>
-                  <Link to="/signup" className="block py-2 px-3  text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+                  <Link to="/signup" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
                     Sign Up
                   </Link>
                 </li>

@@ -5,6 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { FaEye,FaEyeSlash,FaEdit} from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
+import { PopInEffects } from '../../utilities/aos';
 const Dashboard = () => {
   const [entries, setEntries] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +37,7 @@ const Dashboard = () => {
   
     fetchUserRecords();
   }, [user]); // Dependency array should include 'user' to re-run when user changes
-  
+  PopInEffects();
   const [newEntry, setNewEntry] = useState({
     name: '',
     url: '',
@@ -200,7 +201,7 @@ console.log(entries,editedEntry,updatedEntries);
         <main>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Records Section */}
-            <section className="lg:col-span-1 bg-white shadow-md rounded-lg p-4">
+            <section className="lg:col-span-1 bg-white shadow-md rounded-lg p-4"data-aos="fade-right">
               <h2 className="text-2xl font-bold mb-4">Records</h2>
               <ul className="space-y-4 text-balance max-h-96 overflow-y-auto ">
                 {entries.length === 0 ? (
@@ -263,7 +264,7 @@ console.log(entries,editedEntry,updatedEntries);
             </section>
 
             {/* Form Section */}
-            <section className="lg:col-span-2 bg-white shadow-md rounded-lg p-6">
+            <section className="lg:col-span-2 bg-white shadow-md rounded-lg p-6"data-aos="fade-left">
               <header className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">{isEditing ? 'Edit Record' : 'Add Record'}</h1>
               </header>
