@@ -62,7 +62,7 @@ const Home = () => {
 
     {/* Image Section */}
     {!isMobile && (
-      <div className="relative hidden lg:flex lg:w-1/2 lg:items-center lg:justify-center">
+      <div className="relative hidden lg:flex lg:w-1/2 lg:items-center lg:justify-center"data-aos="fade-left">
         <div className="relative lg:w-2/3">
           <img
             src="https://teampassword.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fhomepage-hero1.7b445e2c.png&w=1080&q=75"
@@ -134,11 +134,13 @@ const Home = () => {
     <div className="flex justify-center mt-10">
       <div className="flex items-center bg-blue-100 py-2 px-4 rounded-lg hover:bg-blue-200">
         <span className="text-blue-500 font-medium">Take a Product Tour</span>
+        <Link to="/productTour">
         <button className="w-8 h-8 ml-2 border-2 border-dashed border-blue-500 text-blue-500 rounded flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         </button>
+        </Link>
       </div>
     </div>
   </div>
