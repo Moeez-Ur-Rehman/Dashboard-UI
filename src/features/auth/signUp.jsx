@@ -155,23 +155,25 @@ const Signup = () => {
           </div>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-300 mb-4"
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition duration-300 mb-2"
           >
-            Sign Up
+          Sign Up
           </button>
-        </form>
-        <div className="flex justify-center mt-4">
+          </form>
+          <div className="flex justify-center mt-2">
           <span className="text-gray-500">OR</span>
-        </div>
-        <div className="mt-4">
+          </div>
+          <div className="mt-2">
           <button
-            className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
-            onClick={handleGoogleSignup}
+          className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
+          onClick={handleGoogleSignup}
           >
-            <FcGoogle size={20} className="mr-2" />
-            Sign in with Google
+          <FcGoogle size={20} className="mr-2" />
+           Sign up with Google
           </button>
+
+
         </div>
         <div className="flex justify-between mt-4">
           <Link to="/" className="text-blue-600 hover:underline">Back to Home</Link>

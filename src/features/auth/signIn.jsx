@@ -100,7 +100,7 @@ const Signin = () => {
             Sign In
           </button>
         </form>
-        <Link to="/forgot-password" className="text-blue-600 hover:underline">Forgot Password?</Link>
+        <Link to="/forgot-password" className="text-blue-600 hover:underline ">Forgot Password?</Link>
         <div className="flex justify-center mt-4">
           <span className="text-gray-500">OR</span>
         </div>
