@@ -62,6 +62,11 @@ const Header = () => {
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-6 md:justify-end md:items-center md:mt-0">
             {user ? (
               <>
+              <li>
+                  <Link to="/passwordGenerator" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
+                    Password Generator
+                  </Link>
+                </li>
                 <li>
                   <Link to="/profile" className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500">
                     Profile

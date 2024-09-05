@@ -9,7 +9,7 @@ import UserProfile from "../features/dashboard/profile";
 import Dashboard from "../features/dashboard/dashBoard";
 import NotFound from "../features/home/notFound";
 import ProtectedRoute from './protectedRoutes';
-
+import PasswordGenerator from '../features/home/passwordGenerator';
 export const allroutes = () => {
   return (
     <Routes>
@@ -19,6 +19,7 @@ export const allroutes = () => {
       <Route path="/signin" element={<Signin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/get-started" element={<GetStarted />} />
+      <Route path="/passwordGenerator" element={<PasswordGenerator/>}/>
 
       {/* Protected Routes */}
       <Route
