@@ -6,6 +6,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { FaEye,FaEyeSlash,FaEdit} from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { PopInEffects } from '../../utilities/aos';
+import {Oval} from 'react-loader-spinner';
+
 const Dashboard = () => {
   const [entries, setEntries] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
@@ -14,6 +16,7 @@ const Dashboard = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [editedEntry, setEditedEntry] = useState(null);
   const [user] = useAuthState(auth);
+  const [isLoading, setIsLoading] = useState(false);
   // Fetching user records from Firestore
   
   useEffect(() => {
@@ -60,11 +63,13 @@ const Dashboard = () => {
 
   const handleAddEntry = async () => {
     // Handle file upload if file exists
+    setIsLoading(true); 
     const { name, url, username, password } = newEntry;
 
     // Check if all required fields are filled
     if (!name || !url || !username || !password) {
       alert("Please fill in all required fields: Name, URL, Username, and Password.");
+      setIsLoading(false); 
       return;
     }
     let fileUrl = null;
@@ -86,6 +91,7 @@ const Dashboard = () => {
       attachFiles: null,
     });
     handleAddRecord(entryWithFileUrl);
+    setIsLoading(false); 
   };
 
   const toggleShowPassword = () => {
@@ -208,7 +214,7 @@ console.log(entries,editedEntry,updatedEntries);
                   <li className="text-gray-500">No records available</li>
                 ) : (
                   entries.map((entry, index) => (
-                    <li key={index} className="bg-blue-100 p-4 rounded-md">
+                    <li key={index} className="bg-blue-100 p-4 hover:bg-blue-200 rounded-md">
                       <div className="mb-2">
                         <span className="font-semibold">Username:</span> {entry.username}
                       </div>
@@ -455,7 +461,11 @@ console.log(entries,editedEntry,updatedEntries);
                     onClick={handleAddEntry}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
                   >
-                    Add Record
+                    {isLoading ? (
+                      <Oval type="ThreeDots" color="#fff" height={20} width={20} />
+                    ) : (
+                      'Add Record'
+                    )}
                   </button>
                 </div>
               )}
