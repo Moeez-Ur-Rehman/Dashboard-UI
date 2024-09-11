@@ -81,7 +81,7 @@ const ProfilePage = () => {
               />
               <p className="profile-label"><strong>Display Name:</strong> {profileData.displayName || 'Not set'}</p>
               <p className="profile-label"><strong>Bio:</strong> {profileData.bio || 'Not set'}</p>
-              <button className="profile-button" onClick={() => setEditing(true)}>Edit Profile</button>
+              <button className="profile-button hover:bg-blue-700" onClick={() => setEditing(true)}>Edit Profile</button>
             </div>
           ) : (
             <div className="profile-edit">
@@ -99,8 +99,15 @@ const ProfilePage = () => {
                 className="textarea-field"
               ></textarea>
               <input type="file" onChange={(e) => setFile(e.target.files[0])} className="file-input" />
-              <button className="profile-button" onClick={handleSave}>Save</button>
-              <button className="cancel-button" onClick={() => setEditing(false)}>Cancel</button>
+              <button className="profile-button hover:bg-blue-700" onClick={handleSave}>Save</button>
+              <button 
+              className="cancel-button bg-white border border-black text-black hover:bg-blue-100" 
+              onClick={() => setEditing(false)}
+              
+              >
+              Cancel
+              </button>
+
             </div>
           )}
         </>
