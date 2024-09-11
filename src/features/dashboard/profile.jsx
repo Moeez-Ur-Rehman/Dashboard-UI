@@ -1,220 +1,112 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth, db, storage } from './../../firebase/config'; // Your Firebase imports
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { PopInEffects } from '../../utilities/aos';
-// Helper function to format phone number
-const formatPhone = (value) => {
-  return String(value).replace(/(\d{3})(\d{3})(\d{4})/, '+1($1)$2-$3');
-};
+const ProfilePage = () => {
+  const [user] = useAuthState(auth); // Get the current user
+  const [profileData, setProfileData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [file, setFile] = useState(null);
+  
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-// Main Profile Component
-const UserProfile = () => {
-  PopInEffects()
-  const [profileData, setProfileData] = useState({
-    id: '22',
-    name: 'Amelia Harper',
-    image: 'https://via.placeholder.com/80', // replace with actual image URL
-    email: 'ameliah@dx-email.com',
-    phone: '1234567890',
-    address: '405 E 42nd St',
-    city: 'New York',
-    state: 'NY',
-    country: 'USA',
-    department: 'UI/UX',
-    position: 'Designer',
-    hiredDate: '3/3/2023',
-    birthDate: '5/3/1980',
-  });
+        if (userDoc.exists()) {
+          setProfileData(userDoc.data());
+        } else {
+          console.log('No user profile found in Firestore.');
+        }
+        setLoading(false);
+      }
+    };
 
-  const [isChangePasswordPopupOpened, setIsChangedPasswordPopupOpened] = useState(false);
+    fetchProfileData();
+  }, [user]);
+  PopInEffects();
+  const handleSave = async () => {
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
 
-  // Simulated data change handler
-  const dataChanged = useCallback(() => {
-    console.log('Data changed');
-  }, []);
+      if (file) {
+        const storageRef = ref(storage, `users/${user.uid}/profilePicture`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
 
-  // Change password handler
-  const changePassword = useCallback(() => {
-    setIsChangedPasswordPopupOpened(true);
-  }, []);
+        uploadTask.on(
+          'state_changed',
+          null,
+          (error) => {
+            console.error('Error uploading file:', error);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            await updateDoc(userDocRef, {
+              ...profileData,
+              profilePicture: downloadURL,
+            });
+          }
+        );
+      } else {
+        await updateDoc(userDocRef, profileData);
+      }
+
+      setEditing(false);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading profile...</p>;
+  }
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '20px' }}data-aos="zoom in">
-      {/* Basic Info Section */}
-      <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '20px', marginBottom: '20px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ fontSize: '24px', marginBottom: '20px', fontWeight: 'bold' }}>Basic Info</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <img src={profileData.image} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', marginBottom: '20px' }} />
-          <div>
-            <h3 style={{ fontSize: '20px', margin: '0' }}>{profileData.name}</h3>
-            <p style={{ margin: '0', color: '#888' }}>ID: {profileData.id}</p>
-          </div>
-          <button
-            style={{
-              backgroundColor: '#007bff',
-              color: '#fff',
-              padding: '10px 20px',
-              borderRadius: '5px',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              fontWeight: 'bold',
-              marginTop: '20px',
-            }}
-            onClick={changePassword}
-          >
-            <span role="img" aria-label="lock" style={{ marginRight: '10px' }}>🔒</span>Change Password
-          </button>
-        </div>
+    <div className='flex items-center justify-center min-h-screen bg-gray-100 relative'>
+    <div className="profile-container "data-aos="zoom-in">
+      <h1 className="profile-title">Profile Page</h1>
 
-        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>First Name:</label>
-            <input
-              type="text"
-              value={profileData.name.split(' ')[0]}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>Last Name:</label>
-            <input
-              type="text"
-              value={profileData.name.split(' ')[1]}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>Department:</label>
-            <input
-              type="text"
-              value={profileData.department}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>Position:</label>
-            <input
-              type="text"
-              value={profileData.position}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>Hired Date:</label>
-            <input
-              type="text"
-              value={profileData.hiredDate}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-          <div style={{ marginBottom: '10px' }}>
-            <label style={{ color: '#555', fontWeight: 'bold' }}>Birth Date:</label>
-            <input
-              type="text"
-              value={profileData.birthDate}
-              onChange={dataChanged}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid #ddd',
-                marginTop: '5px',
-              }}
-            />
-          </div>
-        </div>
-      </div>
+      {user && (
+        <>
+          <p className="profile-info"><strong>Email:</strong> {user.email}</p>
 
-      {/* Contacts and Address Section */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {/* Contacts Card */}
-        <div style={{ padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Contacts</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '10px' }}>
-            <i className="fas fa-phone" style={{ fontSize: '24px', marginBottom: '10px' }} />
-            <div>
-              <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>{formatPhone(profileData.phone)}</p>
-              <p style={{ margin: '0', color: '#888' }}>{profileData.email}</p>
+          {!editing ? (
+            <div className="profile-view">
+              <img
+                src={profileData.profilePicture || 'https://via.placeholder.com/100'} // Ensure fallback URL is valid
+                alt="Profile"
+                className="profile-picture"
+              />
+              <p className="profile-label"><strong>Display Name:</strong> {profileData.displayName || 'Not set'}</p>
+              <p className="profile-label"><strong>Bio:</strong> {profileData.bio || 'Not set'}</p>
+              <button className="profile-button" onClick={() => setEditing(true)}>Edit Profile</button>
             </div>
-          </div>
-        </div>
-
-        {/* Address Card */}
-        <div style={{ padding: '20px', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0px 0px 10px rgba(0,0,0,0.1)' }}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '20px' }}>Address</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '10px' }}>
-            <i className="fas fa-map-marker-alt" style={{ fontSize: '24px', marginBottom: '10px' }} />
-            <div>
-              <p style={{ margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
-                {profileData.address}, {profileData.city}, {profileData.state}, {profileData.country}
-              </p>
+          ) : (
+            <div className="profile-edit">
+              <input
+                type="text"
+                value={profileData.displayName || ''}
+                onChange={(e) => setProfileData({ ...profileData, displayName: e.target.value })}
+                placeholder="Enter display name"
+                className="input-field"
+              />
+              <textarea
+                value={profileData.bio || ''}
+                onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+                placeholder="Enter bio"
+                className="textarea-field"
+              ></textarea>
+              <input type="file" onChange={(e) => setFile(e.target.files[0])} className="file-input" />
+              <button className="profile-button" onClick={handleSave}>Save</button>
+              <button className="cancel-button" onClick={() => setEditing(false)}>Cancel</button>
             </div>
-          </div>
-        </div>
-      </div>
+          )}
+        </>
+      )}
+    </div>
+    </div>
+  );};
 
-      {/* Change Password Popup */}
-      {isChangePasswordPopupOpened && (
-        <div style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          backgroundColor: '#fff',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-          zIndex: 1000,
-          maxWidth: '90%',
-          width: '400px',
-          textAlign: 'center'
-        }}>
-          <h3>Change Password</h3>
-          <button
-            style={{
-              padding: '10px 20px',
-              backgroundColor: '#dc3545',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '4px', cursor: 'pointer', marginTop: '16px' }} onClick={() => setIsChangedPasswordPopupOpened(false)} >
-                 Close </button>
-               </div> )} 
-              </div> ); 
-          };
-
-export default UserProfile;
+export default ProfilePage;

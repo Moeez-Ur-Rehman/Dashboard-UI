@@ -31,8 +31,9 @@ const Signin = () => {
       const token = await user.getIdToken(true); // Force refresh of the token
       redirectToDashboardAfterAuthentication(navigate,token);
       
+      
     } catch (err) {
-      setError("Incorrect Password");
+      setError("incorrect Password");
     }
   };
 

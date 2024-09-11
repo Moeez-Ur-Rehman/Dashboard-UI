@@ -62,7 +62,9 @@ const Signup = () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const token = await user.getIdToken(true);
+       
         redirectToDashboardAfterAuthentication(navigate, token);
+        
       } catch (err) {
         console.log(err.message);
         if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
@@ -79,9 +81,12 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
-      const token = await userCredential.user.getIdToken();
-      localStorage.setItem('authToken', token);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+  
+      // Check if user exists, if not, create user data in the database
       console.log('Google Sign-up successful! Redirecting to dashboard...');
+      localStorage.setItem('authToken', token);
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
