@@ -2,7 +2,7 @@ import React, { useState, useEffect,useRef } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, storage } from './../../firebase/config'; // Your Firebase imports
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { PopInEffects } from '../../utilities/aos';
 const ProfilePage = () => {
   const [user] = useAuthState(auth); // Get the current user
@@ -70,6 +70,31 @@ const ProfilePage = () => {
       setEditing(false);
     }
   };
+  const handleRemoveProfilePhoto = async () => {
+    if (user && profileData.profilePicture) {
+      const storageRef = ref(storage, `users/${user.uid}/profilePicture`);
+      
+      try {
+        // Delete the profile picture from storage
+        await deleteObject(storageRef);
+        
+        // Update Firestore to remove the profile picture URL
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, {
+          profilePicture: '', // Set the profile picture field to an empty string
+        });
+        
+        // Update the state to reflect the removal
+        setProfileData((prevState) => ({
+          ...prevState,
+          profilePicture: '',
+        })); alert('Profile photo removed successfully.');
+      } catch (error) {
+        console.error('Error removing profile photo:', error);
+        alert('Failed to remove profile photo. Please try again.');
+      }
+    }
+  };
     const fileInputRef = useRef(null);
   
     const handleButtonClick = () => {
@@ -129,9 +154,16 @@ const ProfilePage = () => {
               onClick={handleButtonClick} 
               className="custom-file-button bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
               >
-             Choose Image
+             Choose Profile Photo
             </button>
-
+            {profileData.profilePicture && (
+                  <button 
+                    className="remove-button bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+                    onClick={handleRemoveProfilePhoto}
+                  >
+                    Remove Photo
+                  </button>
+              )}
               <button className="profile-button hover:bg-blue-700" onClick={handleSave}>Save</button>
               <button 
               className="cancel-button bg-white border border-black text-black hover:bg-blue-100" 
