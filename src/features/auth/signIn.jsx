@@ -107,7 +107,7 @@ const Signin = () => {
         </div>
         <div className="mt-4">
         <button
-        className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
+        className="google-signup bg-white border border-black hover:bg-blue-100 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
         onClick={handleGoogleSignin}
        >
       <FcGoogle size={20} className="mr-2" />

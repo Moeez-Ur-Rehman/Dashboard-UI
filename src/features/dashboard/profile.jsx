@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, storage } from './../../firebase/config'; // Your Firebase imports
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -10,6 +10,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [file, setFile] = useState(null);
+  const [error, setError] = useState('');
   
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -30,7 +31,13 @@ const ProfilePage = () => {
   }, [user]);
   PopInEffects();
   const handleSave = async () => {
+    if (!profileData.displayName) {
+      setError('Username cannot be empty.'); // Set error message
+      return;
+    }
+    setError('');
     if (user) {
+      
       const userDocRef = doc(db, 'users', user.uid);
 
       if (file) {
@@ -49,6 +56,11 @@ const ProfilePage = () => {
               ...profileData,
               profilePicture: downloadURL,
             });
+            // Update the profile data state to trigger a re-render
+            setProfileData(prevState => ({
+              ...prevState,
+              profilePicture: downloadURL,
+            }));
           }
         );
       } else {
@@ -58,6 +70,11 @@ const ProfilePage = () => {
       setEditing(false);
     }
   };
+    const fileInputRef = useRef(null);
+  
+    const handleButtonClick = () => {
+      fileInputRef.current.click();
+    };
 
   if (loading) {
     return <p>Loading profile...</p>;
@@ -90,15 +107,31 @@ const ProfilePage = () => {
                 value={profileData.displayName || ''}
                 onChange={(e) => setProfileData({ ...profileData, displayName: e.target.value })}
                 placeholder="Enter display name"
-                className="input-field"
+                className="input-field focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {error && <p className="text-red-500 text-sm mt-1">{error}</p>} {/* Error message */}
               <textarea
                 value={profileData.bio || ''}
                 onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
                 placeholder="Enter bio"
-                className="textarea-field"
+                className="textarea-field focus:outline-none focus:ring-2 focus:ring-blue-500"
               ></textarea>
-              <input type="file" onChange={(e) => setFile(e.target.files[0])} className="file-input" />
+               <input 
+               type="file" 
+              accept="image/*" 
+              ref={fileInputRef} 
+              onChange={(e) => setFile(e.target.files[0])} 
+              className="hidden" 
+              />
+
+      {/* Custom Button */}
+              <button 
+              onClick={handleButtonClick} 
+              className="custom-file-button bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              >
+             Choose Image
+            </button>
+
               <button className="profile-button hover:bg-blue-700" onClick={handleSave}>Save</button>
               <button 
               className="cancel-button bg-white border border-black text-black hover:bg-blue-100" 
