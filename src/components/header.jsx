@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { auth,db } from '../firebase/config';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { logoutUser } from '../utilities/auth';
 import { FaGlobe } from 'react-icons/fa';
+import { doc, getDoc } from 'firebase/firestore';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Default to closed
@@ -12,9 +13,12 @@ const Header = () => {
   const navigate = useNavigate();
   const [user] = useAuthState(auth);
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
-
+  const [username, setUsername] = useState(''); // State to hold the username
+  const [profilePhoto, setProfilePhoto] = useState('');
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024); 
   useEffect(() => {
     const handleResize = () => {
+      setIsMobileView(window.innerWidth < 1024);
       if (window.innerWidth >= 1024) {
         setIsMenuOpen(true); // Show full menu on larger screens
       } else {
@@ -28,6 +32,27 @@ const Header = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    // Fetch user profile data to get the username and profile photo
+    const fetchProfileData = async () => {
+      if (user) {
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUsername(data.displayName || ''); // Set the username if it exists
+            setProfilePhoto(data.profilePicture || ''); // Set the profile photo URL if it exists
+          }
+        } catch (error) {
+          console.error('Error fetching user profile data:', error);
+        }
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
@@ -85,14 +110,8 @@ const Header = () => {
                     Password Generator
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/profile"
-                    className="block py-2 px-3 text-gray-900 rounded hover:bg-blue-100 lg:hover:bg-transparent lg:hover:text-blue-700 lg:p-0 dark:text-white lg:dark:hover:text-blue-500"
-                  >
-                    Profile
-                  </Link>
-                </li>
+                
+
                 <li>
                   <button
                     onClick={handleLogout}
@@ -102,11 +121,35 @@ const Header = () => {
                     {loading ? 'Logging out...' : 'Logout'}
                   </button>
                 </li>
-                <li>
-                  <Link to="/get-started" className="block bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600 transition lg:ml-4">
-                    Get Premium
+                {!isMobileView ?  (
+                   <li className="flex items-center space-x-2">
+                   {/*<span className="text-gray-900 dark:text-white">{username || 'User'}</span>*/}
+                   <Link to="/profile" >
+                     {profilePhoto ? (
+                       
+                       <img
+                         src={profilePhoto}
+                         alt="Profile"
+                         className="w-8 h-8 rounded-full border-2 border-gray-300"
+                       />
+                     ) : (
+                       <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white">
+                         {username.charAt(0).toUpperCase()}
+                       </div>
+                     )}
+                   </Link>
+                   </li>
+                ):(
+                  <li>
+                  <Link
+                    to="/profile"
+                    className="block py-2 px-3 text-gray-900 rounded hover:bg-blue-100 lg:hover:bg-transparent lg:hover:text-blue-700 lg:p-0 dark:text-white lg:dark:hover:text-blue-500"
+                  >
+                    Profile
                   </Link>
                 </li>
+                )}
+               
               </>
             ) : (
               <>
@@ -187,6 +230,11 @@ const Header = () => {
                     className="block py-2 px-3 text-gray-900  rounded hover:bg-blue-100 lg:hover:bg-transparent lg:hover:text-blue-700 lg:p-0 dark:text-white lg:dark:hover:text-blue-500"
                   >
                     Sign Up
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/get-started" className="block bg-blue-500 text-white px-5 py-2 rounded hover:bg-blue-600 transition lg:ml-4">
+                    Get Started
                   </Link>
                 </li>
               </>
