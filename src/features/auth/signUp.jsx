@@ -62,7 +62,9 @@ const Signup = () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const token = await user.getIdToken(true);
+       
         redirectToDashboardAfterAuthentication(navigate, token);
+        
       } catch (err) {
         console.log(err.message);
         if (err.message === 'Firebase: Error (auth/email-already-in-use).') {
@@ -79,9 +81,12 @@ const Signup = () => {
   const handleGoogleSignup = async () => {
     try {
       const userCredential = await signInWithPopup(auth, googleProvider);
-      const token = await userCredential.user.getIdToken();
-      localStorage.setItem('authToken', token);
+      const user = userCredential.user;
+      const token = await user.getIdToken();
+  
+      // Check if user exists, if not, create user data in the database
       console.log('Google Sign-up successful! Redirecting to dashboard...');
+      localStorage.setItem('authToken', token);
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
@@ -166,7 +171,7 @@ const Signup = () => {
           </div>
           <div className="mt-2">
           <button
-          className="google-signup bg-white border border-black hover:bg-gray-200 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
+          className="google-signup bg-white border border-black hover:bg-blue-100 text-black py-2 rounded-md transition duration-300 w-full flex items-center justify-center"
           onClick={handleGoogleSignup}
           >
           <FcGoogle size={20} className="mr-2" />
